@@ -1,0 +1,20 @@
+{
+  "name": "fullstack-todo-101",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "npm -w frontend run dev & npm -w backend run dev",
+    "dev:fe": "npm -w frontend run dev",
+    "dev:be": "npm -w backend run dev",
+    "build": "npm -ws run build",
+    "test": "npm -ws run test"
+  },
+  "devDependencies": {
+    "vite-tsconfig-paths": "^6.0.3"
+  }
+}
