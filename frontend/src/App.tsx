@@ -6,12 +6,11 @@ import { useForm } from "react-hook-form";
 type Todo = { id: string; todo: string; }
 
 export default function App() {
-  const { register, handleSubmit } = useForm<{todo: Todo['todo']}>();
+  const { register, handleSubmit, reset } = useForm<{todo: Todo['todo']}>();
   const [todos, setTodos] = useState<Todo[]>([])
-  const [isEdit, setIsEdit] = useState({ id: "", todo: "" });
+  const [isEdit, setIsEdit] = useState<Todo>({ id: "", todo: "" });
 
-  const addTodo = async (event :{todo: Todo['todo']}) => {
-    const { todo } = event
+  const addTodo = async ({todo} :{todo: Todo['todo']}) => {
     console.log(todo)
     await axios.post('http://localhost:3000/add', {
       data: {todo}
@@ -19,15 +18,24 @@ export default function App() {
       console.log(response.data)
       const todo = response.data
       setTodos((prev) => [todo, ...prev])
+      reset()
     })
   }
 
-  const editTodo = async ({todo: editTodoName}:{todo: Todo['todo']}) => {
+  const editTodo = async ({todo}:{todo: Todo['todo']}) => {
     await axios.put('http://localhost:3000/update', {
       data: {
         id: isEdit.id,
-        todo: editTodoName
+        todo
       }
+    }).then((response) => {
+      console.log(response.data)
+      const newTodos = todos.map((todo) => todo.id === response.data.id ? response.data : todo)
+      setTodos(newTodos)
+      setIsEdit({ id: "", todo: "" })
+      reset()
+    }).catch((error) => {
+      console.log(error.message)
     })
   }
 
@@ -46,7 +54,7 @@ export default function App() {
       .get("http://localhost:3000")
       .then((response) => {
         console.log(response.data)
-        setTodos(response.data)
+        setTodos(response.data.todos)
       })
       .catch((e) => {
         console.log(e.message);
@@ -55,14 +63,25 @@ export default function App() {
 
   return (
     <>
-      <form onSubmit={handleSubmit(addTodo)}>
-        <input {...register("todo")} type="text" />
+      <form onSubmit={handleSubmit(addTodo)} className='p-4'>
+        <input {...register("todo")} type="text" className='border-gray-500 border'/>
         <button type="submit">add</button>
       </form>
       {todos.map((todo) => (
-        <div key={todo.id} style={{ display: "flex" }}>
-          <p>{todo.todo}</p>
-          <button onClick={() => deleteTodo(todo.id)}>delete</button>
+        <div key={todo.id} className='flex justify-center items-center gap-2'>
+          {isEdit.id === todo.id ? (
+            <form onSubmit={handleSubmit(editTodo)}>
+              <input {...register("todo")} type="text" className='border-gray-500 border'/>
+              <button>send</button>
+            </form>
+          ) : (
+              <>
+                <p>{todo.todo}</p>
+                <button onClick={() => setIsEdit(todo)}>edit</button>
+                <button onClick={() => deleteTodo(todo.id)}>delete</button>
+              </>
+            )
+          }
         </div>
       ))}
     </>);
