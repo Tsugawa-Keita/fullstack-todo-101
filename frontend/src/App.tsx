@@ -12,7 +12,7 @@ export default function App() {
 
   const addTodo = async ({todo} :{todo: Todo['todo']}) => {
     console.log(todo)
-    await axios.post('http://localhost:3000/add', {
+    await axios.post('http://localhost:3000/todos', {
       data: {todo}
     }).then((response) => {
       console.log(response.data)
@@ -23,13 +23,11 @@ export default function App() {
   }
 
   const editTodo = async ({todo}:{todo: Todo['todo']}) => {
-    await axios.put('http://localhost:3000/update', {
+    await axios.put(`http://localhost:3000/todos/${isEdit.id}`, {
       data: {
-        id: isEdit.id,
         todo
       }
     }).then((response) => {
-      console.log(response.data)
       const newTodos = todos.map((todo) => todo.id === response.data.id ? response.data : todo)
       setTodos(newTodos)
       setIsEdit({ id: "", todo: "" })
@@ -40,9 +38,8 @@ export default function App() {
   }
 
   const deleteTodo = async (id: string) => {
-    await axios.delete('http://localhost:3000/delete', {
-      data: {id}
-    }).then((response) => {
+    await axios.delete(`http://localhost:3000/todos/${id}`)
+      .then((response) => {
       console.log(response)
       const newTodos = todos.filter((todo) => todo.id !== id)
       setTodos(newTodos)
@@ -51,7 +48,7 @@ export default function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000")
+      .get("http://localhost:3000/todos")
       .then((response) => {
         console.log(response.data)
         setTodos(response.data.todos)
