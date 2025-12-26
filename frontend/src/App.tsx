@@ -11,11 +11,9 @@ export default function App() {
   const [isEdit, setIsEdit] = useState<Todo>({ id: "", todo: "" });
 
   const addTodo = async ({todo} :{todo: Todo['todo']}) => {
-    console.log(todo)
     await axios.post('http://localhost:3000/todos', {
       data: {todo}
     }).then((response) => {
-      console.log(response.data)
       const todo = response.data
       setTodos((prev) => [todo, ...prev])
       reset()
@@ -24,9 +22,7 @@ export default function App() {
 
   const editTodo = async ({todo}:{todo: Todo['todo']}) => {
     await axios.put(`http://localhost:3000/todos/${isEdit.id}`, {
-      data: {
-        todo
-      }
+      data: {todo}
     }).then((response) => {
       const newTodos = todos.map((todo) => todo.id === response.data.id ? response.data : todo)
       setTodos(newTodos)
@@ -40,8 +36,7 @@ export default function App() {
   const deleteTodo = async (id: string) => {
     await axios.delete(`http://localhost:3000/todos/${id}`)
       .then((response) => {
-      console.log(response)
-      const newTodos = todos.filter((todo) => todo.id !== id)
+      const newTodos = todos.filter((todo) => todo.id !== response.data.id)
       setTodos(newTodos)
     })
   }
