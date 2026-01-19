@@ -1,0 +1,162 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+      tags:
+        - App
+  /todos:
+    get:
+      operationId: TodosController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoItem'
+      summary: List todos
+      tags: &ref_0
+        - Todos
+    post:
+      operationId: TodosController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTodoDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoItem'
+        '400':
+          description: ''
+      summary: Create todo
+      tags: *ref_0
+  /todos/{id}:
+    get:
+      operationId: TodosController_findById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoItem'
+        '400':
+          description: ''
+        '404':
+          description: ''
+      summary: Get todo by id
+      tags: *ref_0
+    patch:
+      operationId: TodosController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTodoDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoItem'
+        '400':
+          description: ''
+        '404':
+          description: ''
+      summary: Update todo
+      tags: *ref_0
+    delete:
+      operationId: TodosController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: ''
+        '400':
+          description: ''
+        '404':
+          description: ''
+      summary: Delete todo
+      tags: *ref_0
+info:
+  title: Todos
+  description: The todos API description
+  version: '1.0'
+  contact: {}
+tags:
+  - name: Todos
+    description: ''
+servers: []
+components:
+  schemas:
+    TodoItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        text:
+          type: string
+          example: Buy milk
+      required:
+        - id
+        - text
+    CreateTodoDto:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Buy milk
+          description: Todo text
+      required:
+        - text
+    UpdateTodoDto:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Buy oat milk
+          description: Todo text
+      required:
+        - text
