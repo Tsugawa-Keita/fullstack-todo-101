@@ -1,4 +1,4 @@
-# todo backend (NestJS置き換えメモ)
+# Todo バックエンド設計メモ
 
 ## 目的
 - NestJSの最小実装（in-memory）でREST契約を固める
