@@ -8,13 +8,15 @@
     "shared"
   ],
   "scripts": {
-    "dev": "npm -w frontend run dev & npm -w backend run start",
-    "dev:fe": "npm -w frontend run dev",
-    "dev:be": "npm -w backend run dev",
-    "build": "npm -ws run build",
+    "gen:api-types": "openapi-typescript backend/openapi.yml -o frontend/src/api-types.ts",
+    "dev": "npm run gen:api-types && (npm -w frontend run dev & npm -w backend run start:dev)",
+    "dev:fe": "npm run gen:api-types && npm -w frontend run dev",
+    "dev:be": "npm -w backend run start:dev",
+    "build": "npm run gen:api-types && npm -ws run build",
     "test": "npm -ws run test"
   },
   "devDependencies": {
+    "openapi-typescript": "^7.10.1",
     "vite-tsconfig-paths": "^6.0.3"
   }
 }
