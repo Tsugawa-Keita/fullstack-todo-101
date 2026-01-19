@@ -8,7 +8,7 @@
     "shared"
   ],
   "scripts": {
-    "dev": "npm -w frontend run dev & npm -w backend run dev",
+    "dev": "npm -w frontend run dev & npm -w backend run start",
     "dev:fe": "npm -w frontend run dev",
     "dev:be": "npm -w backend run dev",
     "build": "npm -ws run build",
