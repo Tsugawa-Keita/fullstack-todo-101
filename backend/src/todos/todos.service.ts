@@ -15,12 +15,11 @@ export class TodosService {
     }
 
     async create(data: Prisma.TodoCreateInput): Promise<Todo> {
-        return this.create(data)
+        return this.prisma.todo.create({data})
     }
 
     async update(params: { where: Prisma.TodoWhereUniqueInput, data: Prisma.TodoUpdateInput }): Promise<Todo> {
-        const { data, where } = params
-        return this.prisma.todo.update({where, data})
+        return this.prisma.todo.update(params)
     }
     
     async remove(where: Prisma.TodoWhereUniqueInput): Promise<Todo> {
