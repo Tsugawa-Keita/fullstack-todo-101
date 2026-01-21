@@ -1,46 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { TodoItem } from './todo.model';
-import { randomUUID } from 'node:crypto';
-import { CreateTodoDto, UpdateTodoDto } from './todo.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma, Todo } from 'src/generated/prisma/client';
 
 @Injectable()
 export class TodosService {
-    private todos: TodoItem[] = [];
+    constructor(private prisma: PrismaService) {}
     
-    findAll(): TodoItem[] {
-        return this.todos
+    async findAll(): Promise<Todo[]> {
+        return this.prisma.todo.findMany()
     }
 
-    findById(id: TodoItem['id']): TodoItem | undefined {
-        return this.todos.find((todo) => todo.id === id)
+    async findById(where: Prisma.TodoWhereUniqueInput): Promise<Todo | null> {
+        return this.prisma.todo.findUnique({where})
     }
 
-    create(dto: CreateTodoDto): TodoItem {
-        const uuid = randomUUID()
-        const createdTodoItem = {id: uuid, text: dto.text}
-        this.todos.push(createdTodoItem)
-        return createdTodoItem;
+    async create(data: Prisma.TodoCreateInput): Promise<Todo> {
+        return this.create(data)
     }
 
-
-    update(id: TodoItem['id'], dto: UpdateTodoDto): TodoItem | undefined {
-        const index = this.todos.findIndex((todo) => todo.id === id)
-        if (index === -1) {
-            return undefined
-        } else {
-            const updatedTodoItem: TodoItem = { id, text: dto.text }
-            this.todos[index] = updatedTodoItem
-            return updatedTodoItem
-        }
+    async update(params: { where: Prisma.TodoWhereUniqueInput, data: Prisma.TodoUpdateInput }): Promise<Todo> {
+        const { data, where } = params
+        return this.prisma.todo.update({where, data})
     }
     
-    remove(id: TodoItem['id']): boolean {
-        const index = this.todos.findIndex((todo) => todo.id === id)
-        if (index === -1) {
-            return false
-        } else {
-            this.todos.splice(index, 1);
-            return true
-        }
+    async remove(where: Prisma.TodoWhereUniqueInput): Promise<Todo> {
+        return this.prisma.todo.delete({where})
     }
 }

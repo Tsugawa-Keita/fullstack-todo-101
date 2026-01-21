@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, NotFoundException, ParseUUIDPipe, HttpCode, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, NotFoundException, ParseIntPipe, HttpCode, Patch, HttpStatus } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { TodoItem } from './todo.model';
 import { TodosService } from './todos.service';
-import { CreateTodoDto, UpdateTodoDto } from './todo.dto';
+import { CreateTodoDto } from '../generated/prisma/nestjs-dto/create-todo.dto';
+import { Todo } from '../generated/prisma/nestjs-dto/todo.entity';
+import { UpdateTodoDto } from '../generated/prisma/nestjs-dto/update-todo.dto';
 
 @Controller('todos')
 @ApiTags('Todos')
@@ -11,19 +12,19 @@ export class TodosController {
 
     @Get()
     @ApiOperation({ summary: 'List todos' })
-    @ApiOkResponse({ type: TodoItem, isArray: true })
-    findAll(): TodoItem[] {
+    @ApiOkResponse({ type: Todo, isArray: true })
+    async findAll(): Promise<Todo[]> {
         return this.todosService.findAll()
     }
 
     @Get(":id")
     @ApiOperation({ summary: 'Get todo by id' })
-    @ApiParam({ name: 'id', schema: { type: 'string', format: 'uuid' } })
-    @ApiOkResponse({ type: TodoItem })
+    @ApiParam({ name: 'id', schema: { type: 'number'} })
+    @ApiOkResponse({ type: Todo })
     @ApiNotFoundResponse()
     @ApiBadRequestResponse()
-    findById(@Param("id", ParseUUIDPipe) id: TodoItem['id']): TodoItem {
-        const foundTodo = this.todosService.findById(id)
+    async findById(@Param("id", ParseIntPipe) todo_id: Todo['todo_id']): Promise<Todo> {
+        const foundTodo = await this.todosService.findById({todo_id})
         if (!foundTodo) {
             throw new NotFoundException();
         } else {
@@ -33,24 +34,23 @@ export class TodosController {
 
     @Post()
     @ApiOperation({ summary: 'Create todo' })
-    @ApiCreatedResponse({ type: TodoItem })
+    @ApiCreatedResponse({ type: Todo })
     @ApiBadRequestResponse()
-    create(@Body() dto: CreateTodoDto): TodoItem {
-        const createdTodo = this.todosService.create(dto)
-        return createdTodo
+    async create(@Body() createTodoDto: CreateTodoDto): Promise<Todo> {
+        return this.todosService.create(createTodoDto)
     }
 
     @Patch(":id")
     @ApiOperation({ summary: 'Update todo' })
-    @ApiParam({ name: 'id', schema: { type: 'string', format: 'uuid' } })
-    @ApiOkResponse({ type: TodoItem })
+    @ApiParam({ name: 'id', schema: { type: 'number'} })
+    @ApiOkResponse({ type: Todo })
     @ApiNotFoundResponse()
     @ApiBadRequestResponse()
-    update(
-        @Param("id", ParseUUIDPipe) id: TodoItem['id'],
-        @Body() dto: UpdateTodoDto
-    ): TodoItem {
-        const updatedTodo = this.todosService.update(id, dto)
+    async update(
+        @Param("id", ParseIntPipe) todo_id: Todo['todo_id'],
+        @Body() updateTodoDto: UpdateTodoDto
+    ): Promise<Todo> {
+        const updatedTodo = await this.todosService.update({ where: { todo_id }, data: updateTodoDto })
         if (!updatedTodo) {
             throw new NotFoundException()
         } else {
@@ -59,14 +59,14 @@ export class TodosController {
     }
 
     @Delete(":id")
-    @HttpCode(204)
+    @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete todo' })
-    @ApiParam({ name: 'id', schema: { type: 'string', format: 'uuid' } })
+    @ApiParam({ name: 'id', schema: { type: 'number'} })
     @ApiNoContentResponse()
     @ApiNotFoundResponse()
     @ApiBadRequestResponse()
-    remove(@Param("id", ParseUUIDPipe) id: TodoItem['id']): void {
-        const isRemoved = this.todosService.remove(id)
+    remove(@Param("id", ParseIntPipe) todo_id: Todo['todo_id']): void {
+        const isRemoved = this.todosService.remove({todo_id})
         if (!isRemoved) {
             throw new NotFoundException()
         }
