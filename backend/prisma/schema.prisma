@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+generator nestjsDto {
+  provider        = "prisma-generator-nestjs-dto"
+  output          = "../src/generated/prisma/nestjs-dto"
+  fileNamingStyle = "kebab"
+
+}
+
+model Todo {
+  todo_id Int    @id @default(autoincrement())
+  text    String @db.VarChar(50)
+
+  @@map("todo")
+}
