@@ -25,7 +25,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TodoItem'
+                  $ref: '#/components/schemas/Todo'
       summary: List todos
       tags: &ref_0
         - Todos
@@ -44,7 +44,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TodoItem'
+                $ref: '#/components/schemas/Todo'
         '400':
           description: ''
       summary: Create todo
@@ -57,15 +57,14 @@ paths:
           required: true
           in: path
           schema:
-            type: string
-            format: uuid
+            type: number
       responses:
         '200':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TodoItem'
+                $ref: '#/components/schemas/Todo'
         '400':
           description: ''
         '404':
@@ -79,8 +78,7 @@ paths:
           required: true
           in: path
           schema:
-            type: string
-            format: uuid
+            type: number
       requestBody:
         required: true
         content:
@@ -93,7 +91,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TodoItem'
+                $ref: '#/components/schemas/Todo'
         '400':
           description: ''
         '404':
@@ -107,8 +105,7 @@ paths:
           required: true
           in: path
           schema:
-            type: string
-            format: uuid
+            type: number
       responses:
         '204':
           description: ''
@@ -129,26 +126,22 @@ tags:
 servers: []
 components:
   schemas:
-    TodoItem:
+    Todo:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        todo_id:
+          type: integer
+          format: int32
         text:
           type: string
-          example: Buy milk
       required:
-        - id
+        - todo_id
         - text
     CreateTodoDto:
       type: object
       properties:
         text:
           type: string
-          example: Buy milk
-          description: Todo text
       required:
         - text
     UpdateTodoDto:
@@ -156,7 +149,3 @@ components:
       properties:
         text:
           type: string
-          example: Buy oat milk
-          description: Todo text
-      required:
-        - text
