@@ -1,10 +1,12 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { writeFileSync } from 'fs';
 import * as path from 'path';
 import { dump } from 'js-yaml';
+import { PrismaClientExceptionFilter } from 'nestjs-prisma';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,7 +24,9 @@ async function bootstrap() {
   writeFileSync(outputPath, dump(document, {}));
 
   app.enableCors();
-  // app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
