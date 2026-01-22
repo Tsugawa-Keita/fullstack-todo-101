@@ -61,28 +61,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        TodoItem: {
-            /**
-             * Format: uuid
-             * @example 3fa85f64-5717-4562-b3fc-2c963f66afa6
-             */
-            id: string;
-            /** @example Buy milk */
+        Todo: {
+            /** Format: int32 */
+            todo_id: number;
             text: string;
         };
         CreateTodoDto: {
-            /**
-             * @description Todo text
-             * @example Buy milk
-             */
             text: string;
         };
         UpdateTodoDto: {
-            /**
-             * @description Todo text
-             * @example Buy oat milk
-             */
-            text: string;
+            text?: string;
         };
     };
     responses: never;
@@ -126,7 +114,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TodoItem"][];
+                    "application/json": components["schemas"]["Todo"][];
                 };
             };
         };
@@ -149,7 +137,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TodoItem"];
+                    "application/json": components["schemas"]["Todo"];
                 };
             };
             400: {
@@ -165,7 +153,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                id: number;
             };
             cookie?: never;
         };
@@ -176,7 +164,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TodoItem"];
+                    "application/json": components["schemas"]["Todo"];
                 };
             };
             400: {
@@ -198,7 +186,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                id: number;
             };
             cookie?: never;
         };
@@ -229,7 +217,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                id: number;
             };
             cookie?: never;
         };
@@ -244,7 +232,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TodoItem"];
+                    "application/json": components["schemas"]["Todo"];
                 };
             };
             400: {
