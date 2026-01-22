@@ -65,8 +65,8 @@ export class TodosController {
     @ApiNoContentResponse()
     @ApiNotFoundResponse()
     @ApiBadRequestResponse()
-    remove(@Param("id", ParseIntPipe) todo_id: Todo['todo_id']): void {
-        const isRemoved = this.todosService.remove({todo_id})
+    async remove(@Param("id", ParseIntPipe) todo_id: Todo['todo_id']): Promise<void> {
+        const isRemoved = await this.todosService.remove({todo_id})
         if (!isRemoved) {
             throw new NotFoundException()
         }
