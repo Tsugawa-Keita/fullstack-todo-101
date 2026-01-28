@@ -25,7 +25,7 @@ export class WebAPI {
     return data;
   }
 
-  public async getTodo(todoId: string) {
+  public async getTodo(todoId: number) {
     const { data, error } = await this.apiClient.GET("/todos/{id}", {
       params: { path: { id: todoId } },
     });
@@ -41,7 +41,7 @@ export class WebAPI {
     return data;
   }
 
-  public async updateTodo(todoId: string, todoText: string) {
+  public async updateTodo(todoId: number, todoText: string) {
     const { data, error } = await this.apiClient.PATCH("/todos/{id}", {
       params: { path: { id: todoId } }, body: {text: todoText}
     });
@@ -49,7 +49,7 @@ export class WebAPI {
     return data;
   }
 
-  public async deleteTodo(todoId: string) {
+  public async deleteTodo(todoId: number) {
     const { error } = await this.apiClient.DELETE("/todos/{id}", {
       params: { path: { id: todoId } },
     });

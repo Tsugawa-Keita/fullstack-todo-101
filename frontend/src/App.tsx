@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { WebAPI } from './web-api';
 import type { components } from './api-types';
 
-type TodoItem = components['schemas']['TodoItem']
+type TodoItem = components['schemas']['Todo']
 
 export default function App() {
   const { register, handleSubmit, setValue, reset } = useForm<{newTodoText: TodoItem['text'], editTodoText: TodoItem['text']}>();
   const [todos, setTodos] = useState<TodoItem[]>([])
-  const [isEdit, setIsEdit] = useState<TodoItem>({ id: "", text: "" });
+  const [isEdit, setIsEdit] = useState<TodoItem>({ todo_id: 0, text: "" });
 
   const api = WebAPI.instance;
 
@@ -21,20 +21,20 @@ export default function App() {
   }
 
   const editTodo = async ({ editTodoText }: { editTodoText: TodoItem['text'] }) => {
-    await api.updateTodo(isEdit.id, editTodoText).then((response) => {
-      const newTodos = todos.map((todo) => todo.id === response.id ? response : todo)
+    await api.updateTodo(isEdit.todo_id, editTodoText).then((response) => {
+      const newTodos = todos.map((todo) => todo.todo_id === response.todo_id ? response : todo)
       setTodos(newTodos)
-      setIsEdit({ id: "", text: "" })
+      setIsEdit({ todo_id: 0, text: "" })
       reset({editTodoText: ""})
     }).catch((error) => {
       console.log(error.message)
     })
   }
 
-  const deleteTodo = async (deleteId: string) => {
+  const deleteTodo = async (deleteId: number) => {
     await api.deleteTodo(deleteId)
       .then(() => {
-      const newTodos = todos.filter((todo) => todo.id !== deleteId)
+      const newTodos = todos.filter((todo) => todo.todo_id !== deleteId)
       setTodos(newTodos)
     })
   }
@@ -56,8 +56,8 @@ export default function App() {
         <button type="submit">add</button>
       </form>
       {todos.map((todo) => (
-        <div key={todo.id} className='flex justify-center items-center gap-2'>
-          {isEdit.id === todo.id ? (
+        <div key={todo.todo_id} className='flex justify-center items-center gap-2'>
+          {isEdit.todo_id === todo.todo_id ? (
             <form onSubmit={handleSubmit(editTodo)}>
               <input {...register("editTodoText")} type="text" className='border-gray-500 border'/>
               <button>send</button>
@@ -69,7 +69,7 @@ export default function App() {
                   setIsEdit(todo)
                   setValue("editTodoText", todo.text)
                 }}>edit</button>
-                <button onClick={() => deleteTodo(todo.id)}>delete</button>
+                <button onClick={() => deleteTodo(todo.todo_id)}>delete</button>
               </>
             )
           }
