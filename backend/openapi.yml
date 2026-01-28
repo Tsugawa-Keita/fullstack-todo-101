@@ -1,18 +1,5 @@
 openapi: 3.0.0
 paths:
-  /:
-    get:
-      operationId: AppController_getHello
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: string
-      tags:
-        - App
   /todos:
     get:
       operationId: TodosController_findAll
