@@ -7,24 +7,24 @@ import type { components } from './api-types';
 type TodoItem = components['schemas']['Todo']
 
 export default function App() {
-  const { register, handleSubmit, setValue, reset } = useForm<{newTodoText: TodoItem['text'], editTodoText: TodoItem['text']}>();
+  const { register, handleSubmit, setValue, reset } = useForm<{newTodoText: TodoItem['title'], editTodoText: TodoItem['title']}>();
   const [todos, setTodos] = useState<TodoItem[]>([])
-  const [isEdit, setIsEdit] = useState<TodoItem>({ todo_id: 0, text: "" });
+  const [isEdit, setIsEdit] = useState<TodoItem>({ todo_id: 0, title: "", created_at: "", completed_at: null });
 
   const api = WebAPI.instance;
 
-  const addTodo = async ({newTodoText} :{newTodoText: TodoItem['text']}) => {
-    await api.createTodo(newTodoText).then((response) => {
+  const addTodo = async ({newTodoText} :{newTodoText: TodoItem['title']}) => {
+    await api.createTodo({ title: newTodoText }).then((response) => {
       setTodos((prev) => [response, ...prev])
       reset({newTodoText: ""})
     })
   }
 
-  const editTodo = async ({ editTodoText }: { editTodoText: TodoItem['text'] }) => {
-    await api.updateTodo(isEdit.todo_id, editTodoText).then((response) => {
+  const editTodo = async ({ editTodoText }: { editTodoText: TodoItem['title'] }) => {
+    await api.updateTodo(isEdit.todo_id, { title: editTodoText }).then((response) => {
       const newTodos = todos.map((todo) => todo.todo_id === response.todo_id ? response : todo)
       setTodos(newTodos)
-      setIsEdit({ todo_id: 0, text: "" })
+      setIsEdit({ todo_id: 0, title: "", created_at: "", completed_at: null })
       reset({editTodoText: ""})
     }).catch((error) => {
       console.log(error.message)
@@ -64,10 +64,10 @@ export default function App() {
             </form>
           ) : (
               <>
-                <p>{todo.text}</p>
+                <p>{todo.title}</p>
                 <button onClick={() => {
                   setIsEdit(todo)
-                  setValue("editTodoText", todo.text)
+                  setValue("editTodoText", todo.title)
                 }}>edit</button>
                 <button onClick={() => deleteTodo(todo.todo_id)}>delete</button>
               </>

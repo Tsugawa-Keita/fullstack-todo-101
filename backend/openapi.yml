@@ -124,7 +124,7 @@ components:
         created_at:
           type: string
           format: date-time
-        complated_at:
+        completed_at:
           type: string
           nullable: true
           format: date-time
@@ -132,13 +132,13 @@ components:
         - todo_id
         - title
         - created_at
-        - complated_at
+        - completed_at
     CreateTodoDto:
       type: object
       properties:
         title:
           type: string
-        complated_at:
+        completed_at:
           type: string
           nullable: true
           format: date-time
@@ -149,7 +149,7 @@ components:
       properties:
         title:
           type: string
-        complated_at:
+        completed_at:
           type: string
           nullable: true
           format: date-time

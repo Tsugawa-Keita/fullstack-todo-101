@@ -52,17 +52,17 @@ export interface components {
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
-            complated_at: string | null;
+            completed_at: string | null;
         };
         CreateTodoDto: {
             title: string;
             /** Format: date-time */
-            complated_at?: string | null;
+            completed_at?: string | null;
         };
         UpdateTodoDto: {
             title?: string;
             /** Format: date-time */
-            complated_at?: string | null;
+            completed_at?: string | null;
         };
     };
     responses: never;

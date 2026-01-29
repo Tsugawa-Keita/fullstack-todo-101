@@ -20,6 +20,6 @@ model Todo {
   /// @IsNotEmpty
   title    String @db.VarChar(50)
   created_at DateTime @default(now())
-  complated_at DateTime?
+  completed_at DateTime?
   @@map("todo")
 }

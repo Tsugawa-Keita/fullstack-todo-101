@@ -50,12 +50,7 @@ export class TodosController {
         @Param("id", ParseIntPipe) todo_id: Todo['todo_id'],
         @Body() updateTodoDto: UpdateTodoDto
     ): Promise<Todo> {
-        const updatedTodo = await this.todosService.update({ where: { todo_id }, data: updateTodoDto })
-        if (!updatedTodo) {
-            throw new NotFoundException()
-        } else {
-            return updatedTodo
-        }
+        return this.todosService.update({ where: { todo_id }, data: updateTodoDto });
     }
 
     @Delete(":id")
@@ -66,9 +61,6 @@ export class TodosController {
     @ApiNotFoundResponse()
     @ApiBadRequestResponse()
     async remove(@Param("id", ParseIntPipe) todo_id: Todo['todo_id']): Promise<void> {
-        const isRemoved = await this.todosService.remove({todo_id})
-        if (!isRemoved) {
-            throw new NotFoundException()
-        }
+        await this.todosService.remove({todo_id});
     }
 }
