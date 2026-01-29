@@ -1,81 +1,112 @@
 import { useEffect, useState } from 'react';
 import './App.css'
-import axios from 'axios';
 import { useForm } from "react-hook-form";
+import { WebAPI } from './web-api';
+import type { components } from './api-types';
 
-type Todo = { id: string; todo: string; }
+type TodoItem = components['schemas']['Todo'];
+type CreateTodoDto = components['schemas']['CreateTodoDto'];
+type UpdateTodoDto = components['schemas']['UpdateTodoDto'];
+
+// 編集状態: todo_idを持つUpdateTodoDto
+type EditingTodo = { todo_id: TodoItem['todo_id'] } & UpdateTodoDto;
 
 export default function App() {
-  const { register, handleSubmit, reset } = useForm<{todo: Todo['todo']}>();
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [isEdit, setIsEdit] = useState<Todo>({ id: "", todo: "" });
+  const { register, handleSubmit, setValue, reset } = useForm<{
+    createTodoDto: CreateTodoDto;
+    updateTodoDto: UpdateTodoDto;
+  }>();
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [editingTodo, setEditingTodo] = useState<EditingTodo | null>(null);
 
-  const addTodo = async ({todo} :{todo: Todo['todo']}) => {
-    console.log(todo)
-    await axios.post('http://localhost:3000/todos', {
-      data: {todo}
-    }).then((response) => {
-      console.log(response.data)
-      const todo = response.data
-      setTodos((prev) => [todo, ...prev])
-      reset()
-    })
-  }
+  const api = WebAPI.instance;
 
-  const editTodo = async ({todo}:{todo: Todo['todo']}) => {
-    await axios.put(`http://localhost:3000/todos/${isEdit.id}`, {
-      data: {
-        todo
+  const addTodo = async (data: { createTodoDto: CreateTodoDto }) => {
+    try {
+      const response = await api.createTodo(data.createTodoDto)
+      setTodos((prev) => [response, ...prev]);
+      reset({ createTodoDto: { title: "" } });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message)
+      } else {
+        console.log('Unknown error occurred')
       }
-    }).then((response) => {
-      const newTodos = todos.map((todo) => todo.id === response.data.id ? response.data : todo)
-      setTodos(newTodos)
-      setIsEdit({ id: "", todo: "" })
-      reset()
-    }).catch((error) => {
-      console.log(error.message)
-    })
+    }
   }
-
-  const deleteTodo = async (id: string) => {
-    await axios.delete(`http://localhost:3000/todos/${id}`)
-      .then((response) => {
-      console.log(response)
-      const newTodos = todos.filter((todo) => todo.id !== id)
-      setTodos(newTodos)
-    })
+  
+  const editTodo = async (data: { updateTodoDto: UpdateTodoDto }) => {
+    if (!editingTodo) return;
+    try {
+      const response = await api.updateTodo(editingTodo.todo_id, data.updateTodoDto)
+      const newTodos = todos.map((todo) => todo.todo_id === response.todo_id ? response : todo);
+      setTodos(newTodos);
+      setEditingTodo(null);
+      reset({ updateTodoDto: { title: "" } });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log('Unknown error occurred');
+      }
+    }
+  }
+  
+  const deleteTodo = async (deleteId: TodoItem['todo_id']) => {
+    try {
+      await api.deleteTodo(deleteId);
+      const newTodos = todos.filter((todo) => todo.todo_id !== deleteId);
+      setTodos(newTodos);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log('Unknown error occurred');
+      }
+    }
   }
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/todos")
-      .then((response) => {
-        console.log(response.data)
-        setTodos(response.data.todos)
-      })
-      .catch((e) => {
-        console.log(e.message);
-      });
+    const fetchTodos = async () => {
+      try {
+        const response = await api.getTodos();
+        setTodos(response);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.log(error.message);
+        } else {
+          console.log('Unknown error occurred');
+        }
+      }
+    }
+    fetchTodos();
   }, []);
 
   return (
     <>
       <form onSubmit={handleSubmit(addTodo)} className='p-4'>
-        <input {...register("todo")} type="text" className='border-gray-500 border'/>
+        <input {...register("createTodoDto.title")} type="text" className='border-gray-500 border'/>
         <button type="submit">add</button>
       </form>
       {todos.map((todo) => (
-        <div key={todo.id} className='flex justify-center items-center gap-2'>
-          {isEdit.id === todo.id ? (
+        <div key={todo.todo_id} className='flex justify-center items-center gap-2'>
+          {editingTodo?.todo_id === todo.todo_id ? (
             <form onSubmit={handleSubmit(editTodo)}>
-              <input {...register("todo")} type="text" className='border-gray-500 border'/>
+              <input {...register("updateTodoDto.title")} type="text" className='border-gray-500 border'/>
               <button>send</button>
             </form>
           ) : (
               <>
-                <p>{todo.todo}</p>
-                <button onClick={() => setIsEdit(todo)}>edit</button>
-                <button onClick={() => deleteTodo(todo.id)}>delete</button>
+                <p>{todo.title}</p>
+                <button onClick={() => {
+                  const editTarget: EditingTodo = {
+                    todo_id: todo.todo_id,
+                    title: todo.title
+                  }
+                  setEditingTodo(editTarget);
+                  setValue("updateTodoDto.title", todo.title);
+                }}>edit</button>
+                <button onClick={() => deleteTodo(todo.todo_id)}>delete</button>
               </>
             )
           }
