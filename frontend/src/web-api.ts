@@ -3,6 +3,10 @@ import type { Client } from "openapi-fetch";
 import type { paths } from "./api-types";
 import type { components } from "./api-types";
 
+type TodoItem = components['schemas']['Todo'];
+type CreateTodoDto = components['schemas']['CreateTodoDto'];
+type UpdateTodoDto = components['schemas']['UpdateTodoDto'];
+
 export class WebAPI {
   private static _instance: WebAPI | undefined;
   private apiClient: Client<paths, `${string}/${string}`>;
@@ -26,7 +30,7 @@ export class WebAPI {
     return data;
   }
 
-  public async getTodo(id: number) {
+  public async getTodo(id: TodoItem['todo_id']) {
     const { data, error } = await this.apiClient.GET("/todos/{id}", {
       params: { path: { id } },
     });
@@ -34,7 +38,7 @@ export class WebAPI {
     return data;
   }
 
-  public async createTodo(createTodoDto: components['schemas']['CreateTodoDto']) {
+  public async createTodo(createTodoDto: CreateTodoDto) {
     const { data, error } = await this.apiClient.POST("/todos", {
       body: createTodoDto
     });
@@ -42,7 +46,7 @@ export class WebAPI {
     return data;
   }
 
-  public async updateTodo(id: components['schemas']['Todo']['todo_id'], updateTodoDto: components['schemas']['UpdateTodoDto']) {
+  public async updateTodo(id: TodoItem['todo_id'], updateTodoDto: UpdateTodoDto) {
     const { data, error } = await this.apiClient.PATCH("/todos/{id}", {
       params: { path: { id } }, body: updateTodoDto
     });
@@ -50,7 +54,7 @@ export class WebAPI {
     return data;
   }
 
-  public async deleteTodo(id: number) {
+  public async deleteTodo(id: TodoItem['todo_id']) {
     const { error } = await this.apiClient.DELETE("/todos/{id}", {
       params: { path: { id } },
     });
