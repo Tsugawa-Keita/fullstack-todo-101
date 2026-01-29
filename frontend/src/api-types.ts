@@ -48,13 +48,21 @@ export interface components {
         Todo: {
             /** Format: int32 */
             todo_id: number;
-            text: string;
+            title: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            complated_at: string | null;
         };
         CreateTodoDto: {
-            text: string;
+            title: string;
+            /** Format: date-time */
+            complated_at?: string | null;
         };
         UpdateTodoDto: {
-            text?: string;
+            title?: string;
+            /** Format: date-time */
+            complated_at?: string | null;
         };
     };
     responses: never;
