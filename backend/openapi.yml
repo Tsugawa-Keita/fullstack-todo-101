@@ -119,20 +119,37 @@ components:
         todo_id:
           type: integer
           format: int32
-        text:
+        title:
           type: string
+        created_at:
+          type: string
+          format: date-time
+        complated_at:
+          type: string
+          nullable: true
+          format: date-time
       required:
         - todo_id
-        - text
+        - title
+        - created_at
+        - complated_at
     CreateTodoDto:
       type: object
       properties:
-        text:
+        title:
           type: string
+        complated_at:
+          type: string
+          nullable: true
+          format: date-time
       required:
-        - text
+        - title
     UpdateTodoDto:
       type: object
       properties:
-        text:
+        title:
           type: string
+        complated_at:
+          type: string
+          nullable: true
+          format: date-time
