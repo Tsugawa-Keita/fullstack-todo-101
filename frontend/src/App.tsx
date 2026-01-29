@@ -17,7 +17,7 @@ export default function App() {
     editTodo: UpdateTodoDto;
   }>();
   const [todos, setTodos] = useState<TodoItem[]>([]);
-  const [isEdit, setIsEdit] = useState<EditingTodo>({ todo_id: 0, title: "" });
+  const [editingTodo, setEditingTodo] = useState<EditingTodo | null>(null);
 
   const api = WebAPI.instance;
 
@@ -29,10 +29,12 @@ export default function App() {
   };
 
   const editTodo = async (data: { editTodo: UpdateTodoDto }) => {
-    await api.updateTodo(isEdit.todo_id, data.editTodo).then((response) => {
+    if (!editingTodo) return;
+
+    await api.updateTodo(editingTodo.todo_id, data.editTodo).then((response) => {
       const newTodos = todos.map((todo) => todo.todo_id === response.todo_id ? response : todo);
       setTodos(newTodos);
-      setIsEdit({ todo_id: 0, title: "" });
+      setEditingTodo(null);
       reset({ editTodo: { title: "" } });
     }).catch((error) => {
       console.log(error.message);
@@ -65,7 +67,7 @@ export default function App() {
       </form>
       {todos.map((todo) => (
         <div key={todo.todo_id} className='flex justify-center items-center gap-2'>
-          {isEdit.todo_id === todo.todo_id ? (
+          {editingTodo?.todo_id === todo.todo_id ? (
             <form onSubmit={handleSubmit(editTodo)}>
               <input {...register("editTodo.title")} type="text" className='border-gray-500 border'/>
               <button>send</button>
@@ -74,7 +76,7 @@ export default function App() {
               <>
                 <p>{todo.title}</p>
                 <button onClick={() => {
-                  setIsEdit({ todo_id: todo.todo_id, title: todo.title });
+                  setEditingTodo({ todo_id: todo.todo_id, title: todo.title });
                   setValue("editTodo.title", todo.title);
                 }}>edit</button>
                 <button onClick={() => deleteTodo(todo.todo_id)}>delete</button>
