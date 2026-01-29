@@ -18,7 +18,8 @@ generator nestjsDto {
 model Todo {
   todo_id Int    @id @default(autoincrement())
   /// @IsNotEmpty
-  text    String @db.VarChar(50)
-
+  title    String @db.VarChar(50)
+  created_at DateTime @default(now())
+  complated_at DateTime?
   @@map("todo")
 }
